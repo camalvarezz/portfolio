@@ -150,6 +150,24 @@ header{
 }
 .vframe{position:relative;width:min(100%,280px);aspect-ratio:608/1280;margin:0 auto;border-radius:20px;overflow:hidden;border:1px solid var(--divisor);background:#EEF1F2;box-shadow:0 18px 40px -22px rgba(31,45,61,.35)}
 .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vframe{container-type:inline-size}
+.vcover{position:absolute;inset:0;width:100%;height:100%;border:0;padding:9cqw 8cqw 10cqw;display:flex;flex-direction:column;align-items:flex-start;text-align:left;cursor:pointer;color:#fff;font-family:inherit;background:radial-gradient(90% 55% at 85% 0%,rgba(255,255,255,.16),transparent 70%),linear-gradient(165deg,#1D5C96 0%,#18667F 55%,#0F6B73 100%);transition:opacity .5s ease}
+.vframe.playing .vcover{opacity:0;pointer-events:none}
+.vc-eyebrow{font-family:var(--font-mono);font-size:3cqw;letter-spacing:.18em;text-transform:uppercase;color:#F6E3CC;font-weight:500}
+.vc-chart{width:100%;height:auto;margin-top:9cqw;overflow:visible}
+.vc-line{stroke-dasharray:1;stroke-dashoffset:1;animation:vcdraw 2.2s .3s ease forwards}
+.vc-dot{opacity:0;animation:vcpop .5s 1.9s ease forwards}
+.vc-ring{opacity:0;transform-box:fill-box;transform-origin:center;animation:vcring 2s 2.2s ease-out infinite}
+.vc-play{align-self:center;margin:auto 0;width:17cqw;height:17cqw;border-radius:50%;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px -10px rgba(8,43,55,.6);transition:transform .25s ease}
+.vc-play svg{width:50%;height:50%;margin-left:6%}
+.vcover:hover .vc-play,.vcover:focus-visible .vc-play{transform:scale(1.08)}
+.vcover:focus-visible{outline:3px solid #D9B08C;outline-offset:-6px}
+.vc-title{font-weight:800;font-size:11.5cqw;line-height:1.04;letter-spacing:-.03em}
+.vc-sub{margin-top:3.5cqw;font-size:4.3cqw;color:#F6E3CC;font-weight:500}
+@keyframes vcdraw{to{stroke-dashoffset:0}}
+@keyframes vcpop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+@keyframes vcring{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.6)}}
+@media (prefers-reduced-motion:reduce){.vc-line{animation:none;stroke-dashoffset:0}.vc-dot{animation:none;opacity:1}.vc-ring{animation:none}}
 .vframe video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#E4EBEC;display:block}
 .video:hover .play{transform:scale(1.08);background:#fff}
 .video .play svg{width:18px;fill:var(--teal);margin-left:3px}
@@ -605,7 +623,21 @@ img.zoomable{cursor:zoom-in}
           <source src="video-presentacion.mp4" type="video/mp4">
           Tu navegador no puede reproducir este video. <a href="video-presentacion.mp4">Descargarlo</a>.
         </video>
+        <button class="vcover" type="button" aria-label="Reproducir video de presentación">
+          <span class="vc-eyebrow">Data Analytics · Reporting · BI</span>
+          <svg class="vc-chart" viewBox="0 0 240 150" fill="none" aria-hidden="true">
+            <g stroke="#fff" stroke-opacity=".16"><path d="M0 20H240M0 55H240M0 90H240M0 125H240"/></g>
+            <path d="M0 108H240" stroke="#fff" stroke-opacity=".4" stroke-dasharray="3 5"/>
+            <path class="vc-line" d="M0 98 L34 90 L68 96 L102 86 L136 92 L170 38 L204 46 L240 36" stroke="#fff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" pathLength="1"/>
+            <circle class="vc-ring" cx="170" cy="38" r="9" stroke="#D9B08C" stroke-width="2"/>
+            <circle class="vc-dot" cx="170" cy="38" r="7" fill="#D9B08C" stroke="#fff" stroke-width="2"/>
+          </svg>
+          <span class="vc-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="#1D5C96"/></svg></span>
+          <span class="vc-title">Hola, soy Camila.</span>
+          <span class="vc-sub">Mi presentación en 36 segundos</span>
+        </button>
       </div>
+      <noscript><style>.vcover{display:none}</style></noscript>
       <p class="caption" style="text-align:center">Video de presentación</p>
     </div>
   </div>
@@ -1357,6 +1389,18 @@ focusCase();
     const c=src.cloneNode(true); c.removeAttribute('id'); c.setAttribute('data-step',st.dataset.step);
     const w=document.createElement('div'); w.className='viz-inline'; w.setAttribute('aria-hidden','true'); w.appendChild(c);
     st.insertBefore(w,st.firstChild);
+  });
+})();
+
+/* ---------- Video de presentación: la carátula se va al darle play ---------- */
+(function(){
+  const f=document.querySelector('.vframe'); if(!f) return;
+  const v=f.querySelector('video'), c=f.querySelector('.vcover'); if(!v||!c) return;
+  c.addEventListener('click',()=>{ const p=v.play(); if(p&&p.catch) p.catch(()=>{}); });
+  v.addEventListener('play',()=>f.classList.add('playing'));
+  v.addEventListener('ended',()=>{
+    v.currentTime=0; f.classList.remove('playing');
+    const g=c.querySelector('.vc-chart'); if(g) g.replaceWith(g.cloneNode(true));   /* la línea se vuelve a dibujar */
   });
 })();
 
